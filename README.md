@@ -48,6 +48,7 @@ g() ->
     fun(X, Y, Z) ->
             X * Y / Z
     end.
+```
 
 And this:
 ```erlang
