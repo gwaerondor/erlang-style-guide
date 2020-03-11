@@ -126,7 +126,8 @@ f() ->
 
 Don't do this:
 ```erlang
-   Number=a()+b(),
+f() ->
+Number=a()+b(),
    (Number==3)orelse(g()<5).
 ```
 
