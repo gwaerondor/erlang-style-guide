@@ -166,6 +166,22 @@ the code look better, in practice the 50 mutually indented lines are almost
 never updated when the fifty-first line that needs one or two more spaces than
 the rest enters the code, and then it just looks very messy instead.
 
+Do this:
+```erlang
+Apples = 5,
+Pears = 2,
+Bananas = 10,
+Pommegranates = 7.
+```
+
+Don't do this:
+```erlang
+Apples        = 5,
+Pears         = 2,
+Bananas       = 10,
+Pommegranates = 7.
+```
+
 ## Make it look like actual text
 We want the code to be easy to read. Make the code look like actual text.
 This is a catch-all rule to avoid madness such as lines starting with commas.
