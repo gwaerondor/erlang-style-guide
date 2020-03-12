@@ -225,3 +225,34 @@ If a macro is a constant, give it a name in all caps.
 ```erlang
 -define(SPEED_OF_LIGHT, 299792458).
 ```
+
+# Data types
+## Don't use lists for collections of fixed sizes
+If the size of a collection of elements is known, use a tuple, map, record or
+some other suitable data type.
+Lists are for collections of variable sizes and can make the reader of the
+code do a double-take, or trying in vain to find in which cases the list has
+other sizes.
+
+## Don't use tuples of size one
+Tuples are for a collection of elements. There is absolutely no reason to put
+a single element into a tuple. Pattern matching should be solved in other ways
+than by separating a concept into a single element or a single element in a
+tuple, for example by using a tuple of size two with the match done on an atom.
+
+# Function style
+## Don't do extractions in the function head
+Deconstructing data types in the function header is for pattern matching, it is
+not a good place to extract data. Data is supposed to be created/extracted as
+close to where it is used as possible. A function head is not the place to
+extract the 40 elements from nested records that some case clauses may or may
+not need, especially not when *some* of those are used for pattern matching.
+
+It makes it near impossible for the reader of the code to know which ones are
+for pattern matching and which ones are just extractions if the function heads
+aren't very, very tiny.
+
+Be pragmatic though. Don't spend five lines to extract data from a trivial
+data structure in some trivial one-liner function. If there is only one or two
+un-nested data structures as input parameters, extracting in the function head
+might be much easier to read than adding several lines just for extraction.
