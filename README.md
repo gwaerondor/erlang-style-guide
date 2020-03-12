@@ -226,6 +226,62 @@ If a macro is a constant, give it a name in all caps.
 -define(SPEED_OF_LIGHT, 299792458).
 ```
 
+## Don't name ignored variables
+If a variable is to be ignored, it should have the name `_`. No more, no less.
+If you follow this rule, the problem of using ignored variables doesn't exist.
+
+### It's indicative of a code structuring problem
+If you need to give a variable a name like `_Parameters` in order for the code
+to make sense, there is a deeper problem there.
+
+Name the variable like this:
+```erlang
+f(Ordinal) ->
+    case Ordinal of
+        first -> 1;
+        second -> 2;
+        _ -> {error, unknown_ordinal}
+    end.
+```
+
+Don't write it in such a way that enforces a `_Name` style variable in order to
+not make it confusing.
+```erlang
+f(first) -> 1;
+f(second) -> 2;
+f(_Ordinal) -> {error, unknown_ordinal}.
+```
+Those are obviously toy examples but you can still guess how fast it can get
+much more complicated than having to guess what `first` and `second` have in
+common and are supposed to represent.
+
+If multiple clauses are used, it should be obvious from earlier clauses what's
+inside each input argument without them needing `_Name` style names.
+```erlang
+f(Height, Length, Width) when Height > Width andalso Width > Length ->
+   Height + Width * Length;
+f(_, Length, Width) ->
+   Length * Width.
+```
+
+If you need to do a lot of scrolling up and down, and compare lots of different
+function clauses in order to get all of the data, then you have a deeper problem
+that cannot and should not be solved by variable naming.
+
+### They get assigned values
+It is *possible* to do this even though you definitely shouldn't.
+```erlang
+_A = 1,
+_B = 5,
+_A + _B.
+```
+
+In other words, `_Name` style variables get a value assigned to them.
+Unused `_Name` style variables might get removed by the compiler, I'm not
+entirely sure, but it might lead to other bad practices such as *using*
+ignored variables, for example in macros that only evaluate the variable
+in case certain compiler flags are set, etc.
+
 # Data types
 ## Don't use lists for collections of fixed sizes
 If the size of a collection of elements is known, use a tuple, map, record or
@@ -256,3 +312,12 @@ Be pragmatic though. Don't spend five lines to extract data from a trivial
 data structure in some trivial one-liner function. If there is only one or two
 un-nested data structures as input parameters, extracting in the function head
 might be much easier to read than adding several lines just for extraction.
+
+# Testing
+## One assertion per test
+One test tests one thing. It's fine to have checks for example for setups,
+since the test should crash as early as possible. But test one and only one
+scenario per test. This way, it is not necessary to perform any manual analysis
+to be able to see which functionality is failing. It will also not hide
+the errors of functionalities that are tested before the first assertion, thus
+requiring several iterations to fix several failing assertions.
