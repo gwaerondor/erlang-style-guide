@@ -383,6 +383,23 @@ data structure in some trivial one-liner function. If there is only one or two
 un-nested data structures as input parameters, extracting in the function head
 might be much easier to read than adding several lines just for extraction.
 
+## Return the last statement directly
+The last evaluated statement is always returned. There is no need to assign to a
+variable just to return the same variable on the next line.
+
+Do this:
+```erlang
+Test = fun first_test/0,
+run_test_case(Test).
+```
+
+Don't do this:
+```erlang
+Test = fun first_test/0,
+Result = run_test_case(Test),
+Result.
+```
+
 # Testing
 ## One assertion per test
 One test tests one thing. It's fine to have checks for example for setups,
