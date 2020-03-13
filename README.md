@@ -283,18 +283,88 @@ ignored variables, for example in macros that only evaluate the variable
 in case certain compiler flags are set, etc.
 
 # Data types
-## Don't use lists for collections of fixed sizes
+## Lists
+### Don't use lists for collections of fixed sizes
 If the size of a collection of elements is known, use a tuple, map, record or
 some other suitable data type.
 Lists are for collections of variable sizes and can make the reader of the
 code do a double-take, or trying in vain to find in which cases the list has
 other sizes.
 
-## Don't use tuples of size one
+### Append elements to the head of a list
+Build a list from the head. The way lists are defined in Erlang and indeed many
+other functional languages, it's optimal to add new list elements to the
+beginning of the list, rather than the end of it.
+Every time a new element is appended to the end of a list, the entire list must
+be rebuilt. This is especially important when working with strings, which are
+disguised lists. It's tempting to build a string starting with the first word
+and ending with the last.
+
+Use different approaches instead, such as using `lists:reverse/1` after
+the list has been completed. If building a list, try building line by line
+and reversing the order of the lines at the end. Using `io_lib:format/2` is
+also a great option.
+
+`lists:reverse/1` is a native function and therefore very fast, so don't be
+afraid to use it.
+
+### Append to the head of a list with the cons operator `|`
+Use the cons operator for clean code without noise. This mimics the behaviour
+of how lists are actually treated by the Erlang virtual machine, and encourages
+adding new elements to the *head* of the list rather than the tail.
+
+Put new elements into a list like this:
+```erlang
+-spec f([any()]) -> [any()].
+f(Some_stuff) ->
+    E1 = new_element(),
+    E2 = another_new_element(),
+    [E1, E2 | Some_stuff].
+```
+Don't do this:
+```erlang
+-spec f([any()]) -> [any()].
+f(Some_stuff) ->
+    E1 = new_element(),
+    E2 = another_new_element(),
+    [E1, E2] ++ Some_stuff.
+```
+Absolutely don't do this:
+```erlang
+[E1] ++ [E2] ++ Some_stuff.
+```
+The same applies for any *set* number of elements appended to a list.
+
+### Use the relevant modules to handle file names
+Use `filename`, `filelib` and `file` when handling files and file names.
+Don't concatenate file paths with `++`. This requires knowledge about the
+value stored in the variable describing each part of the path - for example,
+was there a / at the end of the string or does one need to be added?
+This is all handled automatically by the `filename` module.
+It also ensures that paths are not OS-dependent.
+
+## Tuples
+### Don't use tuples of size one
 Tuples are for a collection of elements. There is absolutely no reason to put
 a single element into a tuple. Pattern matching should be solved in other ways
 than by separating a concept into a single element or a single element in a
 tuple, for example by using a tuple of size two with the match done on an atom.
+
+## Strings
+### Use multi-line strings to avoid long lines
+It's possible to break up a single string into several lines, by ending one
+line with a double quote and beginning the next line with one. Do this to avoid
+exceeding the maximum character length of a line for long strings.
+Example:
+```erlang
+help_text_format() ->
+    "How to use this script~n"
+        "  Input parameters:~n"
+        "    Iterations: How many times the test should be run~n"
+        "    Granularity: Defines the smallest time unit to measure~n".
+```
+Do note that multi-line strings are to be indented one level beyond the first
+line, as per OTP standard.
 
 # Function style
 ## Don't do extractions in the function head
