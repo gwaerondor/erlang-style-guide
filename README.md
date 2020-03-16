@@ -283,6 +283,58 @@ ignored variables, for example in macros that only evaluate the variable
 in case certain compiler flags are set, etc.
 
 # Data types
+## Use unsurprising return values
+Always make sure that a function returns a data type that doesn't surprise
+the user by breaking conventions.
+
+Some common return values are booleans and tuples indicating success,
+and a result or an error message. If the function is used for its side effects
+and not for its return value, use `ok` is the preferred way to indicate success.
+If you aren't using one of the following structures, you might want to
+reconsider your approach:
+```erlang
+{ok, Result} | {error, Reason}.
+Result | {error, Reason}.
+ok.
+ok | {error, Reason}.
+true | false.
+```
+
+Don't try to be clever by using return values that make little sense just
+so you can remove a line from a pattern match. Use widely accepted conventions.
+Avoid surprising return types such as these:
+```erlang
+{true, Result} | false.
+yes | no.
+ok | false.
+ok | error.
+```
+
+## Use booleans for flags
+When passing arguments around that serve as flags, use `true` to indicate
+that the flag is turned on, and `false` to indicate that it is turned off.
+
+Don't use the *name* of the flag to indicate that it is turned on, and any
+other value to indicate that it is turned off.
+
+Do this:
+```erlang
+log(Message, IsFT) ->
+    case IsFT of
+        true -> ct:pal(Message);
+        false -> ok
+    end.
+```
+
+Don't do this:
+```erlang
+log(Message, FT) ->
+    case FT of
+        ft -> ct:pal(Message);
+        _ -> ok
+    end.
+```
+
 ## Lists
 ### Don't use lists for collections of fixed sizes
 If the size of a collection of elements is known, use a tuple, map, record or
