@@ -397,10 +397,11 @@ It also ensures that paths are not OS-dependent.
 
 ## Tuples
 ### Don't use tuples of size one
-Tuples are for a collection of elements. There is absolutely no reason to put
+Tuples are for a collection of elements. There is no good reason to put
 a single element into a tuple. Pattern matching should be solved in other ways
 than by separating a concept into a single element or a single element in a
-tuple, for example by using a tuple of size two with the match done on an atom.
+tuple, for example by using a tuple of size two with an atom inside that can
+be used for pattern matching.
 
 ## Strings
 ### Use multi-line strings to avoid long lines
