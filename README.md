@@ -229,7 +229,9 @@ If a macro is a constant, give it a name in all caps.
 
 ## Don't name ignored variables
 If a variable is to be ignored, it should have the name `_`. No more, no less.
-If you follow this rule, the problem of using ignored variables doesn't exist.
+By definition, ignored variables are unimportant, and it doesn't matter what's
+inside them. If you follow this rule, the risk of using ignored variables also
+disappears.
 
 ### It's indicative of a code structuring problem
 If you need to give a variable a name like `_Parameters` in order for the code
@@ -267,7 +269,7 @@ f(_, Length, Width) ->
 
 If you need to do a lot of scrolling up and down, and compare lots of different
 function clauses in order to get all of the data, then you have a deeper problem
-that cannot and should not be solved by variable naming.
+that cannot and should not be solved by naming ignored variables.
 
 ### They get assigned values
 It is *possible* to do this even though you definitely shouldn't.
@@ -434,6 +436,38 @@ Don't do this:
 ```erlang
 fun() -> f() end
 ```
+
+## Consistent typing across the entire system
+Use exactly one way to represent one concept. Decide early on what something
+should look like and stick with it. This is necessary to avoid creating several
+interface functions or library functions that must be used to convert the data
+to a format that the current module understands.
+
+Worse yet, as the system gets larger, the boarders that contain the data that
+looks different in different places might become fuzzy, and the different
+formats start leaking into other parts of the code, requiring the usage of a
+transformation "just in case" *every* time the data is used.
+
+Use OTP-defined types first and foremost. If this doesn't suffice, records
+(with type specs that can be checked by Dialyzer) or other well-defined data
+structures like maps or tuples can be used.
+
+For example, do use the OTP types `inet:ip_address()`, `inet:ip4_address()`
+and `inet:ip6_address()` to represent IP addresses throughout your entire
+codebase.
+
+Don't do this:
+```erlang
+get_ip({v4, {A, B, C, D}}) -> {A, B, C, D};
+get_ip({ipv4, [A, B, C, D]}) -> {A, B, C, D};
+get_ip(#{ip_version := ipv4, ip_address := Addr}) -> Addr;
+get_ip({ipv4, IpString}) when is_list(IpString) -> get_ip(inet:parse(IP));
+get_ip({ok, IP}) -> IP.
+```
+
+You may think the example is too extreme - but this is actually a paraphrased
+real-life example that I *truncated*, there are way more function clauses in
+the real-life code!
 
 # Function style
 ## Don't do extractions in the function head
