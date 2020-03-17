@@ -503,6 +503,56 @@ Result = run_test_case(Test),
 Result.
 ```
 
+## One-liner clauses
+If a function contains one statement that can be put on a single line without
+exceeding the character width limitation, do so. This keeps the code short and
+consise, and reflects the presumably low complexity of the function.
+
+```erlang
+add(X, Y) -> X + Y.
+```
+
+If the function has multiple clauses and each of the function bodies fulfil the
+same requirement, put each function clause on one line.
+```erlang
+add({X, Ix}, {Y, Iy}) -> {add(X, Y), add(Ix, Iy)};
+add(X, Y) -> X + Y.
+```
+
+However, if only one of the clauses has a body that is longer than one
+statement, put *all* function bodies on new lines to keep the function
+consistent - that makes it easier to parse.
+
+```erlang
+add({X, Y}) ->
+    X + Y;
+add({X, Y, Z}) ->
+    X + Y + Z;
+add(Terms) ->
+    handle_dimension_error(Terms),
+    {error, unknown_dimension}.
+```
+
+The same rules apply to the clauses of `case` statements:
+```erlang
+add(Terms) ->
+    case Terms of
+        {X, Y} -> X + Y;
+        {X, Y, Z} -> X + Y + Z
+    end.
+```
+
+```erlang
+divide(Numerator, Denominator) ->
+    case Denominator of
+        0 ->
+            handle_division_error(Numerator),
+            {error, division_by_zero};
+        _ ->
+            Numerator / Denominator
+    end.
+```
+
 # Testing
 ## One assertion per test
 One test tests one thing. It's fine to have checks for example for setups,
