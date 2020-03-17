@@ -419,6 +419,21 @@ help_text_format() ->
 Do note that multi-line strings are to be indented one level beyond the first
 line, as per OTP standard.
 
+## Functions
+### Use the shorthand form for anonymous functions
+When applicable, always use the shorthand form `fun f/0`. It's cleaner than
+wrapping the function call in the `fun() ... end` syntax.
+
+Do this:
+```erlang
+fun f/0
+```
+
+Don't do this:
+```erlang
+fun() -> f() end
+```
+
 # Function style
 ## Don't do extractions in the function head
 Deconstructing data types in the function header is for pattern matching, it is
