@@ -217,7 +217,8 @@ in all-caps.
 Do this:
 ```erlang
 Some_variable = f(),
-GCD = greatest_common_divisor(123, Some_variable).
+GCD = greatest_common_divisor(123, Some_variable),
+do_something(GCD).
 ```
 
 ## Use `?ALL_CAPS` macro names for constants
